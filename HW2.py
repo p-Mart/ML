@@ -63,7 +63,7 @@ def weightUpdateSign(W, X, Y, learning_rate, iterations):
 	for step in range(iterations):
 
 		sys.stdout.write("Training progress: [%d / %d]	\r" % (step+1, iterations))
-		#sys.stdout.flush()
+		sys.stdout.flush()
 
 		for i in range(X.shape[0]):
 			if(np.sign(W.dot(X[i,:])) != Y[i]):
@@ -74,11 +74,14 @@ def weightUpdateSign(W, X, Y, learning_rate, iterations):
 
 def weightUpdateSigmoid(W, X, Y, learning_rate, iterations):
 	for step in range(iterations):
-			for i in range(X.shape[0]):
-				output = sigmoid(W.dot(X[i,:]))
-				if(binary(output) != Y[i]):
-					W = W + learning_rate*(1 - output)*output*Y[i]*X[i,:]
-					#print learning_rate*Y[i]*X[i,:]
+
+		sys.stdout.write("Training progress: [%d / %d]	\r" % (step+1, iterations))
+		sys.stdout.flush()
+
+		for i in range(X.shape[0]):
+			output = sigmoid(W.dot(X[i,:]))
+			#if(binary(output) != Y[i]):
+			W = W +learning_rate*(Y[i] - output)*(1 - output)*output*X[i,:]
 		
 	return W
 
@@ -102,7 +105,7 @@ if __name__ == "__main__":
 	learning_rate = 0.02
 
 	print("Training...")
-	W = weightUpdateSign(W, X_train, Y_train, learning_rate, iterations = 1000)
+	W = weightUpdateSigmoid(W, X_train, Y_train, learning_rate, iterations = 80)
 	print("\nDone.")
 	print("Accuracy on training set: "), predict(W, X_train,Y_train), "%"
 	print("Accuracy on test set: "), predict(W, X_test, Y_test), "%"
