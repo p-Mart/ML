@@ -1,5 +1,8 @@
+#Solution to question 1.
+
 import csv, sys
 import numpy as np
+import matplotlib.pyplot as plt
 
 categories = {}
 
@@ -7,9 +10,9 @@ def binary(x):
 	return 1. if x >= 0.5 else -1.
 
 def sigmoid(x):
-	if(x < -1e8):
+	if(x < -1e4):
 		return 0.
-	elif(x > 1e8):
+	elif(x > 1e4):
 		return 1.
 
 	return (1.0 / (1.0 + np.exp(-x)))	
@@ -70,6 +73,8 @@ def weightUpdateSign(W, X, Y, learning_rate, iterations):
 				W = W + learning_rate * Y[i] * X[i,:]
 				#print learning_rate*Y[i]*X[i,:]
 	
+	sys.stdout.write("\n")
+	sys.stdout.flush()
 	return W
 
 def weightUpdateSigmoid(W, X, Y, learning_rate, iterations):
@@ -82,7 +87,9 @@ def weightUpdateSigmoid(W, X, Y, learning_rate, iterations):
 			output = sigmoid(W.dot(X[i,:]))
 			#if(binary(output) != Y[i]):
 			W = W +learning_rate*(Y[i] - output)*(1 - output)*output*X[i,:]
-		
+
+	sys.stdout.write("\n")
+	sys.stdout.flush()	
 	return W
 
 def predict(W, X, Y):
@@ -104,9 +111,24 @@ if __name__ == "__main__":
 	
 	learning_rate = 0.02
 
+	iterations = []
+	losses = []
+	
 	print("Training...")
-	W = weightUpdateSigmoid(W, X_train, Y_train, learning_rate, iterations = 80)
-	print("\nDone.")
-	print("Accuracy on training set: "), predict(W, X_train,Y_train), "%"
-	print("Accuracy on test set: "), predict(W, X_test, Y_test), "%"
+	for i in range(50):
+		sys.stdout.write("Iteration %d \n" % i)
+		sys.stdout.flush()
+		W = np.random.rand(X_train.shape[1])
+		W = weightUpdateSigmoid(W, X_train, Y_train, learning_rate, iterations = i)
+		iterations.append(i)
+		losses.append(predict(W, X_test,Y_test))
+	
+	plt.plot(iterations, losses)
+	plt.title("Accuracy on test set vs. number of training epochs")
+	plt.xlabel("# Epochs")
+	plt.ylabel("Accuracy (%)")
+	plt.show()
+
+	print("Best accuracy on test set: "), max(losses), "%"
+
 
